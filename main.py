@@ -1,20 +1,25 @@
 import os
 
 import requests
+from requests_oauthlib import OAuth1
+
+consumer_key = os.getenv("TWITTER_CONSUMER_KEY")
+consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET")
+
+# need to pull this from DB
+oauth_token = os.getenv("OAUTH_TOKEN")
+oauth_token_secret = os.getenv("OAUTH_TOKEN_SECRET")
+
+oauth = OAuth1(
+    client_key=consumer_key,
+    client_secret=consumer_secret,
+    resource_owner_key=oauth_token,
+    resource_owner_secret=oauth_token_secret,
+)
 
 
-def oauth2(consumer_key, consumer_secret):
-    r = requests.post(
-        "https://api.twitter.com/oauth2/token",
-        auth=(consumer_key, consumer_secret),
-        headers={"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
-        data={"grant_type": "client_credentials"},
-    )
-    return r.json()
+url = u"https://api.twitter.com/1.1/account/settings.json"
+r = requests.get(url, auth=oauth)
 
-
-if __name__ == "__main__":
-    consumer_key = os.getenv("TWITTER_CONSUMER_KEY", None)
-    consumer_secret = os.getenv("TWITTER_CONSUMER_SECRET", None)
-    r = oauth2()
-    # https://developer.twitter.com/en/docs/metrics/get-tweet-engagement/overview
+print(r.status_code)
+print(r.json())
